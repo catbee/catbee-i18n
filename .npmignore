@@ -1,0 +1,9 @@
+node_modules/
+.babelrc
+.editorconfig
+.npmignore
+.eslintignore
+.eslintrc.js
+.gitignore
+src/
+test/
