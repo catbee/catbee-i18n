@@ -1,7 +1,7 @@
 {
   "name": "catbee-i18n",
   "author": "Eugeny Dementev",
-  "version": "0.0.4",
+  "version": "1.0.0",
   "description": "i18n service for catbee",
   "main": "./dist/index.js",
   "scripts": {
@@ -13,7 +13,7 @@
   "dependencies": {
     "lodash.get": "^4.2.1",
     "lodash.memoize": "^4.0.3",
-    "parse-gettext-plural-form": "^0.0.6"
+    "parse-gettext-plural-form": "^1.0.0"
   },
   "devDependencies": {
     "babel-cli": "^6.8.0",
