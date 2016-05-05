@@ -381,8 +381,6 @@ experiment('I18n', () => {
         });
 
         i18n._injectVariables({}, string);
-
-
       });
 
       test('Вытягивается путь через точку', (done) => {
@@ -395,16 +393,6 @@ experiment('I18n', () => {
         };
 
         assert.equal('строка', i18n._injectVariables(context, string));
-
-        done();
-      });
-    });
-
-    experiment('_parsePluralForm', () => {
-      test('Если формула не gettext Plural-Froms то SyntaxError', (done) => {
-        assert.throws(() => {
-          i18n._parsePluralForm('(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)');
-        }, SyntaxError);
 
         done();
       });

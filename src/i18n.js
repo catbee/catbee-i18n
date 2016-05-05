@@ -1,5 +1,6 @@
-const _memoize = require('lodash.memoize');
 const _get = require('lodash.get');
+const _memoize = require('lodash.memoize');
+const parsePluralForm = _memoize(require('parse-gettext-plural-form'));
 
 const glue = '\u0004'; // po2json glue symbol
 exports.glue = glue;
@@ -13,8 +14,6 @@ class I18n {
     this._glue = _get(this._config, 'l10n.glue', glue);
     this._plural = _get(this._config, 'l10n.plural', 'nplurals=2; plural=(n != 1)');
     this._context = _get(this._config, 'l10n.context', 'l10n');
-
-    this._parsePluralForm = _memoize(this._parsePluralForm.bind(this));
   }
 
   /**
@@ -130,36 +129,16 @@ class I18n {
 
   _getPluralNumber (l10n, number) {
     const form = _get(l10n, ['', 'plural-forms'], this._plural);
-    const rule = this._parsePluralForm(form);
 
-    return rule(number);
-  }
+    try {
+      const plural = parsePluralForm(form);
 
-  _parsePluralForm (form) {
-    const re = /^(\s*nplurals\s*=\s*[0-9]+\s*;\s*plural\s*=\s*(?:\s|[-\?\|&=!<>+*/%:;a-zA-Z0-9_()])+)$/m;
+      return plural(number);
+    } catch (e) {
+      this._bus.emit('error', e);
 
-    if (re.test(form)) {
-      let pf = form;
-      if (!/;\s*$/.test(pf)) {
-        pf += ';';
-      }
-
-      const code = `
-        var plural;
-        var nplurals;
-        ${pf}
-        return (plural === true ? 1 : plural ? plural : 0);
-      `;
-
-      try {
-        return new Function('n', code); // eslint-disable-line no-new-func
-      } catch (e) {
-        this._bus.emit('error', e);
-        return () => 0;
-      }
+      return 0;
     }
-
-    throw new SyntaxError(`Plural-Forms is invalid [${form}]`);
   }
 }
 
