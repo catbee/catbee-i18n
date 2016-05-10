@@ -1,9 +1,11 @@
 node_modules/
+src/
+test/
 .babelrc
 .editorconfig
-.npmignore
 .eslintignore
 .eslintrc.js
 .gitignore
-src/
-test/
+.npmignore
+index.js
+

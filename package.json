@@ -1,7 +1,7 @@
 {
   "name": "catbee-i18n",
   "author": "Eugeny Dementev",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "i18n service for catbee",
   "main": "./dist/index.js",
   "scripts": {
