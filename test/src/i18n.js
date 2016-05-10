@@ -8,8 +8,7 @@ const EventEmitter = require('events').EventEmitter;
 
 const I18n = require('../../src/i18n');
 const ruPluralForm = 'nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);';
-const ruPluralContext = { l10n: {'': { 'plural-forms': ruPluralForm }}};
-
+const ruPluralContext = { l10n: { '': { 'plural-forms': ruPluralForm } } };
 
 experiment('I18n', () => {
   let i18n, locator;
@@ -31,7 +30,7 @@ experiment('I18n', () => {
       test('Без перевода.', (done) => {
         const str = 'привет';
 
-        assert.equal(str, i18n._t(str));
+        assert.equal(str, i18n._t(str, {}));
 
         done();
       });
@@ -84,7 +83,7 @@ experiment('I18n', () => {
       test('Без перевода.', (done) => {
         const str = 'привет';
 
-        assert.equal(str, i18n._pt(context, str));
+        assert.equal(str, i18n._pt(context, str, {}));
 
         done();
       });
@@ -132,13 +131,16 @@ experiment('I18n', () => {
     });
 
     experiment('_nt - Перевод со склонением (plural).', () => {
-      test('Без перевода.', (done) => {
+      test('Без перевода', (done) => {
         const ruPlural = [2, 0, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 1];
         const str = 'фотография';
         const plural1 = 'фотографии';
         const plural2 = 'фотографий';
 
         const plural = [str, plural1, plural2];
+
+        i18n._plural = ruPluralForm; // установка дефолтной Plural-Forms.
+        // В случае отсутствия перевода, берется она
 
         for (let i = 0; i < ruPlural.length; i++) {
           assert.equal(
@@ -157,6 +159,9 @@ experiment('I18n', () => {
         const plural2 = '$count фотографий';
 
         const plural = ['фотография', 'фотографии', 'фотографий'];
+
+        i18n._plural = ruPluralForm; // установка дефолтной Plural-Forms.
+        // В случае отсутствия перевода, берется она
 
         for (let i = 0; i < ruPlural.length; i++) {
           assert.equal(
@@ -234,6 +239,9 @@ experiment('I18n', () => {
 
         const plural = [str, plural1, plural2];
 
+        i18n._plural = ruPluralForm; // установка дефолтной Plural-Forms.
+        // В случае отсутствия перевода, берется она
+
         for (let i = 0; i < ruPlural.length; i++) {
           assert.equal(
             plural[ruPlural[i]],
@@ -250,6 +258,9 @@ experiment('I18n', () => {
         const plural2 = '$count карт';
 
         const plural = ['карта', 'карты', 'карт'];
+
+        i18n._plural = ruPluralForm; // установка дефолтной Plural-Forms.
+        // В случае отсутствия перевода, берется она
 
         for (let i = 0; i < ruPlural.length; i++) {
           assert.equal(
@@ -372,7 +383,7 @@ experiment('I18n', () => {
 
       test('При отсутствии значения бросается ошибка', (done) => {
         const string = '$hh';
-        const result = 'TypeError: Cannon inject $hh, not a string or number';
+        const result = 'TypeError: i18n - cannon inject $hh, not a string or number';
 
         const bus = locator.resolve('eventBus');
         bus.on('error', (error) => {

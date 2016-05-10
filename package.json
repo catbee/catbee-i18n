@@ -11,9 +11,8 @@
     "test": "lab -T node_modules/babel-lab test -l"
   },
   "dependencies": {
-    "lodash.get": "^4.2.1",
-    "lodash.memoize": "^4.0.3",
-    "parse-gettext-plural-form": "^1.0.0"
+    "i18n-base-methods": "^0.0.1",
+    "lodash.get": "^4.2.1"
   },
   "devDependencies": {
     "babel-cli": "^6.8.0",

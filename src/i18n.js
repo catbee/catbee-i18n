@@ -1,6 +1,5 @@
 const _get = require('lodash.get');
-const _memoize = require('lodash.memoize');
-const parsePluralForm = _memoize(require('parse-gettext-plural-form'));
+const i18nMethods = require('i18n-base-methods');
 
 const glue = '\u0004'; // po2json glue symbol
 exports.glue = glue;
@@ -11,9 +10,9 @@ class I18n {
   constructor (locator) {
     this._bus = locator.resolve('eventBus');
     this._config = locator.resolve('config');
-    this._glue = _get(this._config, 'l10n.glue', glue);
-    this._plural = _get(this._config, 'l10n.plural', 'nplurals=2; plural=(n != 1)');
-    this._context = _get(this._config, 'l10n.context', 'l10n');
+    this._glue = _get(this._config, 'i18n.glue', glue);
+    this._plural = _get(this._config, 'i18n.plural', 'nplurals=1; plural=0;');
+    this._context = _get(this._config, 'i18n.context', 'l10n');
   }
 
   /**
@@ -25,9 +24,22 @@ class I18n {
    * @public
    */
   _t (str, ctx) {
+    if (arguments.length < 2) {
+      this._bus.emit('error', new Error('Not enough arguments for _t'));
+      return str;
+    }
+
     const l10n = _get(ctx, this._context);
 
-    const template = _get(l10n, [str, 1], str);
+    let template;
+
+    try {
+      template = i18nMethods
+        ._t({ l10n, plural: this._plural }, str);
+    } catch (e) {
+      this._bus.emit('error', e);
+      template = str;
+    }
 
     return this._injectVariables(ctx, template);
   }
@@ -42,9 +54,22 @@ class I18n {
    * @public
    */
   _pt (context, str, ctx) {
+    if (arguments.length < 3) {
+      this._bus.emit('error', new Error('Not enough arguments for _pt'));
+      return str;
+    }
+
     const l10n = _get(ctx, this._context);
 
-    const template = _get(l10n, [`${context}${this._glue}${str}`, 1], str);
+    let template;
+
+    try {
+      template = i18nMethods
+        ._pt({ l10n, plural: this._plural }, context, str);
+    } catch (e) {
+      this._bus.emit('error', e);
+      template = str;
+    }
 
     return this._injectVariables(ctx, template);
   }
@@ -58,15 +83,27 @@ class I18n {
    * @public
    */
   _nt (str, ...rest) {
+    if (arguments.length < 3) {
+      this._bus.emit('error', new Error('Not enough arguments for _nt'));
+      return str;
+    }
+
     const ctx = rest.pop();
+
     const number = rest.pop();
 
     const l10n = _get(ctx, this._context);
+    const plurals = [str, ...rest];
 
-    const plural = [str, ...rest];
-    const n = this._getPluralNumber(l10n, number);
+    let template;
 
-    const template = _get(l10n, [str, n + 1], plural[n]);
+    try {
+      template = i18nMethods
+        ._nt({ l10n, plural: this._plural }, plurals, number);
+    } catch (e) {
+      this._bus.emit('error', e);
+      template = str;
+    }
 
     return this._injectVariables(ctx, template);
   }
@@ -81,15 +118,26 @@ class I18n {
    * @public
    */
   _npt (context, str, ...rest) {
+    if (arguments.length < 4) {
+      this._bus.emit('error', new Error('Not enough arguments for _npt'));
+      return str;
+    }
+
     const ctx = rest.pop();
     const number = rest.pop();
 
     const l10n = _get(ctx, this._context);
+    const plurals = [str, ...rest];
 
-    const plural = [str, ...rest];
-    const n = this._getPluralNumber(l10n, number);
+    let template;
 
-    const template = _get(l10n, [`${context}${this._glue}${str}`, n + 1], plural[n]);
+    try {
+      template = i18nMethods
+        ._npt({ l10n, plural: this._plural }, context, plurals, number);
+    } catch (e) {
+      this._bus.emit('error', e);
+      template = str;
+    }
 
     return this._injectVariables(ctx, template);
   }
@@ -121,24 +169,12 @@ class I18n {
    */
   _validateVariable (path, value) {
     if (!/(string|number)/.test(typeof value)) {
-      this._bus.emit('error', new TypeError(`Cannon inject ${path}, not a string or number`));
+      this._bus.emit('error', new TypeError(
+        `i18n - cannon inject ${path}, not a string or number`
+      ));
     }
 
     return `${value}`;
-  }
-
-  _getPluralNumber (l10n, number) {
-    const form = _get(l10n, ['', 'plural-forms'], this._plural);
-
-    try {
-      const plural = parsePluralForm(form);
-
-      return plural(number);
-    } catch (e) {
-      this._bus.emit('error', e);
-
-      return 0;
-    }
   }
 }
 
