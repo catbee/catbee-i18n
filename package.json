@@ -12,7 +12,8 @@
   },
   "dependencies": {
     "i18n-base-methods": "^0.0.1",
-    "lodash.get": "^4.2.1"
+    "lodash.get": "^4.2.1",
+    "replace-variables": "^0.0.1"
   },
   "devDependencies": {
     "babel-cli": "^6.8.0",

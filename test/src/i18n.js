@@ -36,7 +36,7 @@ experiment('I18n', () => {
       });
 
       test('С переменной без перевода.', (done) => {
-        const str = '$str';
+        const str = '${str}';
 
         const hbContext = {
           str: 'ничоси'
@@ -62,11 +62,11 @@ experiment('I18n', () => {
       });
 
       test('С переводом и переменной.', (done) => {
-        const str = 'привет $name';
+        const str = 'привет ${name}';
 
         const root = {
           l10n: {
-            'привет $name': [null, 'hello $name']
+            'привет ${name}': [null, 'hello ${name}']
           },
           name: 'Dude'
         };
@@ -89,7 +89,7 @@ experiment('I18n', () => {
       });
 
       test('С переменной без перевода.', (done) => {
-        const str = '$str';
+        const str = '${str}';
 
         const hbContext = {
           str: 'ничоси'
@@ -115,11 +115,11 @@ experiment('I18n', () => {
       });
 
       test('С переводом и переменной.', (done) => {
-        const str = 'привет $name';
+        const str = 'привет ${name}';
 
         const root = {
           l10n: {
-            [`${context}${i18n._glue}${str}`]: [null, 'hello $name']
+            [`${context}${i18n._glue}${str}`]: [null, 'hello ${name}']
           },
           name: 'Dude'
         };
@@ -154,9 +154,9 @@ experiment('I18n', () => {
 
       test('С переменной без перевода.', (done) => {
         const ruPlural = [2, 0, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 1];
-        const str = '$count фотография';
-        const plural1 = '$count фотографии';
-        const plural2 = '$count фотографий';
+        const str = '${count} фотография';
+        const plural1 = '${count} фотографии';
+        const plural2 = '${count} фотографий';
 
         const plural = ['фотография', 'фотографии', 'фотографий'];
 
@@ -200,16 +200,16 @@ experiment('I18n', () => {
 
       test('С переводом и переменной.', (done) => {
         const csPlural = [2, 0, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2];
-        const str = '$count филиал';
-        const plural1 = '$count филиала';
-        const plural2 = '$count филиалов';
+        const str = '${count} филиал';
+        const plural1 = '${count} филиала';
+        const plural2 = '${count} филиалов';
 
         const plural = ['pobočka', 'pobočky', 'poboček'];
 
         const root = {
           l10n: {
             '': { 'plural-forms': 'nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2\n' },
-            [str]: [str, '$count pobočka', '$count pobočky', '$count poboček']
+            [str]: [str, '${count} pobočka', '${count} pobočky', '${count} poboček']
           }
         };
 
@@ -253,9 +253,9 @@ experiment('I18n', () => {
       });
       test('С переменной без перевода.', (done) => {
         const ruPlural = [2, 0, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 1];
-        const str = '$count карта';
-        const plural1 = '$count карты';
-        const plural2 = '$count карт';
+        const str = '${count} карта';
+        const plural1 = '${count} карты';
+        const plural2 = '${count} карт';
 
         const plural = ['карта', 'карты', 'карт'];
 
@@ -302,16 +302,16 @@ experiment('I18n', () => {
       });
       test('С переводом и переменной.', (done) => {
         const enPlural = [1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-        const str = '$count карта';
-        const plural1 = '$count карты';
-        const plural2 = '$count карт';
+        const str = '${count} карта';
+        const plural1 = '${count} карты';
+        const plural2 = '${count} карт';
 
         const plural = ['card', 'cards'];
 
         const root = {
           l10n: {
             '': { 'plural-forms': 'nplurals=2; plural=(n != 1)\n' },
-            [`${context}${i18n._glue}${str}`]: [str, '$count card', '$count cards']
+            [`${context}${i18n._glue}${str}`]: [str, '${count} card', '${count} cards']
           }
         };
 
@@ -326,84 +326,6 @@ experiment('I18n', () => {
               .assign({}, root, { count: i }))
           );
         }
-
-        done();
-      });
-    });
-  });
-
-  experiment('Helpers function', () => {
-    experiment('_injectVariables', () => {
-      test('Строка без $переменных не изменяется.', (done) => {
-        const strings = [
-          'ывашгр',
-          'аывргшаырг  ываргшгры авгрш',
-          'fsa0 j0f sdsfdj0 jj',
-          "Запутанная \" 'строка' \"",
-          '\''
-        ];
-
-        strings.forEach((string) => assert.equal(string, i18n._injectVariables({}, string)));
-
-        done();
-      });
-
-      test('Все повторяющиеся переменные заменяются.', (done) => {
-        const string = '$hello $hello $hello';
-
-        const context = { hello: 'привет' };
-
-        assert.equal('привет привет привет', i18n._injectVariables(context, string));
-
-        done();
-      });
-
-      test('Переменные с взаимовложенными именами так же нормально заменяются', (done) => {
-        const string = '$h $hh $hhh $hhhh';
-
-        const context = {
-          h: 1,
-          hh: 2,
-          hhh: 3,
-          hhhh: 4
-        };
-
-        assert.equal('1 2 3 4', i18n._injectVariables(context, string));
-
-        done();
-      });
-
-      test('Не переменные не заменяются', (done) => {
-        const string = '$1 $ h$ $$ 100$ $10';
-
-        assert.equal('$1 $ h$ $$ 100$ $10', i18n._injectVariables({}, string));
-
-        done();
-      });
-
-      test('При отсутствии значения бросается ошибка', (done) => {
-        const string = '$hh';
-        const result = 'TypeError: i18n - cannon inject $hh, not a string or number';
-
-        const bus = locator.resolve('eventBus');
-        bus.on('error', (error) => {
-          assert.equal(result, `${error}`);
-          done();
-        });
-
-        i18n._injectVariables({}, string);
-      });
-
-      test('Вытягивается путь через точку', (done) => {
-        const string = '$h.h';
-
-        const context = {
-          h: {
-            h: 'строка'
-          }
-        };
-
-        assert.equal('строка', i18n._injectVariables(context, string));
 
         done();
       });
